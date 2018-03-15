@@ -36,9 +36,8 @@ driver = {
 
     Runtime.addShutdownHook {
         try {
-            //if (testDriver.isOpen)
             testDriver.quit()
-        } catch (UnreachableBrowserException | SessionNotCreatedException ignored) {
+        } catch (Exception ignored) {
             println("Browser is gone, so test driver doesn't need to be shutdown")
         }
     }
