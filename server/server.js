@@ -78,7 +78,7 @@ var authDoneHandler = function (request) {
     return data;
 }
 
-//Start the server and make it listen for connections on port 8080
+//Start the server and make it listen for connections on port 8100
 
 app.listen(8100);
 console.log('Server running at http://127.0.0.1:8100');
