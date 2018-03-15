@@ -89,7 +89,29 @@ final class Idsh {
             System.err.println(idsh.text)
         }
 
-        com.google.common.base.Preconditions.checkState(exitValue == 0, "Idsh exited with a non-zero exit status of $exitValue")
+        checkState(exitValue == 0, "Idsh exited with a non-zero exit status of $exitValue")
+        rollbackCount++
+    }
+
+    /**
+     * Deletes a value from the running configuration.
+     *
+     * If the path refers to a subtree of the configuration (e.g., a profile), that entire portion of the
+     * configuration data store will be dropped.
+     *
+     * @param path the path to the configuration setting to delete
+     */
+    void delete(String path) {
+        def idsh = "idsh -s".execute()
+        idsh.out << """
+            configure
+            delete $path
+            commit
+            quit
+            quit            
+        """
+
+        waitForIdshToQuit(idsh)
         rollbackCount++
     }
 
@@ -139,7 +161,7 @@ final class Idsh {
     }
 
     private static void waitForIdshToQuit(Process idsh) {
-        com.google.common.base.Preconditions.checkState(idsh.waitFor(2, TimeUnit.SECONDS), "Idsh didn't shutdown in a timely manner")
+        checkState(idsh.waitFor(2, TimeUnit.SECONDS), "Idsh didn't shutdown in a timely manner")
     }
 
     private static String copyTestConfigToTempFile(String resourceFileName) {
