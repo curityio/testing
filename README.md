@@ -1,5 +1,8 @@
 # Testing and Automation
 
+[![Quality](https://curity.io/assets/images/badges/testing-quality.svg)](https://curity.io/resources/code-examples/status/)
+[![Availability](https://curity.io/assets/images/badges/testing-availability.svg)](https://curity.io/resources/code-examples/status/)
+
 This repository includes various utilities for automated testing of the Curity Identity Server.
 
 # Run Node Server
