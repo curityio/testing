@@ -1,7 +1,7 @@
 # Testing and Automation
 
-[![Quality](https://curity.io/assets/images/badges/testing-quality.svg)](https://curity.io/resources/code-examples/status/)
-[![Availability](https://curity.io/assets/images/badges/testing-availability.svg)](https://curity.io/resources/code-examples/status/)
+[![Quality](https://img.shields.io/badge/quality-demo-red)](https://curity.io/resources/code-examples/status/)
+[![Availability](https://img.shields.io/badge/availability-source-blue)](https://curity.io/resources/code-examples/status/)
 
 This repository includes various utilities for automated testing of the Curity Identity Server.
 
