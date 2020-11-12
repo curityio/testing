@@ -21,13 +21,12 @@ import io.curity.identityserver.plugin.test.config.TestAuthenticatorPluginConfig
 import se.curity.identityserver.sdk.authentication.AuthenticatorRequestHandler;
 import se.curity.identityserver.sdk.haapi.RepresentationFunction;
 import se.curity.identityserver.sdk.plugin.descriptor.AuthenticatorPluginDescriptor;
-import se.curity.identityserver.sdk.plugin.descriptor.HaapiPluginDescriptor;
 
 import java.util.Collections;
 import java.util.Map;
 
 public final class TestAuthenticatorPluginDescriptor
-        implements AuthenticatorPluginDescriptor<TestAuthenticatorPluginConfig>, HaapiPluginDescriptor
+        implements AuthenticatorPluginDescriptor<TestAuthenticatorPluginConfig>
 {
 
     @Override
