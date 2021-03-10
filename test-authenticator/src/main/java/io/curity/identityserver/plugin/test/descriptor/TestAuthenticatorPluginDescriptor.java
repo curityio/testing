@@ -19,6 +19,7 @@ package io.curity.identityserver.plugin.test.descriptor;
 import io.curity.identityserver.plugin.test.authentication.TestAuthenticatorRequestHandler;
 import io.curity.identityserver.plugin.test.config.TestAuthenticatorPluginConfig;
 import se.curity.identityserver.sdk.authentication.AuthenticatorRequestHandler;
+import se.curity.identityserver.sdk.haapi.RepresentationFunction;
 import se.curity.identityserver.sdk.plugin.descriptor.AuthenticatorPluginDescriptor;
 
 import java.util.Collections;
@@ -53,4 +54,19 @@ public final class TestAuthenticatorPluginDescriptor
         return handlersMap;
     }
 
+    @Override
+    public Map<String, Class<? extends RepresentationFunction>> getRepresentationFunctions()
+    {
+        // This plugin works by automatically signing in any user who sends a GET request to the server.
+        // It doesn't collect any information from the user, hence it doesn't require any representation to generate
+        // views, the user is automatically authenticated and redirected back to the application, so all we need to
+        // do here is return a non-null value, so the Curity Server knows this plugin supports HAAPI even without
+        // providing any representations.
+        return Collections.emptyMap();
+    }
+
+    private static <T> Map<String, T> mapOf(String key, T value)
+    {
+        return Collections.unmodifiableMap(Collections.singletonMap(key, value));
+    }
 }
