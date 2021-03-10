@@ -22,17 +22,20 @@ import se.curity.identityserver.sdk.authentication.AuthenticatorRequestHandler;
 import se.curity.identityserver.sdk.plugin.descriptor.AuthenticatorPluginDescriptor;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 public final class TestAuthenticatorPluginDescriptor
         implements AuthenticatorPluginDescriptor<TestAuthenticatorPluginConfig>
 {
+    public final static String IMPLEMENTATION_TYPE = "test";
+
     public final static String CALLBACK = "callback";
 
     @Override
     public String getPluginImplementationType()
     {
-        return "test";
+        return IMPLEMENTATION_TYPE;
     }
 
     @Override
@@ -44,7 +47,10 @@ public final class TestAuthenticatorPluginDescriptor
     @Override
     public Map<String, Class<? extends AuthenticatorRequestHandler<?>>> getAuthenticationRequestHandlerTypes()
     {
-        return Collections.unmodifiableMap(Collections.singletonMap("index", TestAuthenticatorRequestHandler.class));
+        Map<String, Class<? extends AuthenticatorRequestHandler<?>>> handlersMap = new HashMap<>();
+        handlersMap.put("index", TestAuthenticatorRequestHandler.class);
+        handlersMap.put("ciba-auth", TestAuthenticatorRequestHandler.class);
+        return handlersMap;
     }
 
 }
