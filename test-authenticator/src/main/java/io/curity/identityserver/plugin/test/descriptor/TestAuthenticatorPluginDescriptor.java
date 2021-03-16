@@ -31,8 +31,6 @@ public final class TestAuthenticatorPluginDescriptor
 {
     public final static String IMPLEMENTATION_TYPE = "test";
 
-    public final static String CALLBACK = "callback";
-
     @Override
     public String getPluginImplementationType()
     {
@@ -51,7 +49,7 @@ public final class TestAuthenticatorPluginDescriptor
         Map<String, Class<? extends AuthenticatorRequestHandler<?>>> handlersMap = new HashMap<>();
         handlersMap.put("index", TestAuthenticatorRequestHandler.class);
         handlersMap.put("ciba-auth", TestAuthenticatorRequestHandler.class);
-        return handlersMap;
+        return Collections.unmodifiableMap(handlersMap);
     }
 
     @Override
@@ -65,8 +63,4 @@ public final class TestAuthenticatorPluginDescriptor
         return Collections.emptyMap();
     }
 
-    private static <T> Map<String, T> mapOf(String key, T value)
-    {
-        return Collections.unmodifiableMap(Collections.singletonMap(key, value));
-    }
 }

@@ -1,8 +1,10 @@
 package io.curity.identityserver.plugin.test.authentication;
 
+import io.curity.identityserver.plugin.test.config.TestAuthenticatorPluginConfig;
+import io.curity.identityserver.plugin.test.config.TestBackchannelAuthenticatorConfig;
+import io.curity.identityserver.plugin.test.descriptor.TestAuthenticatorPluginDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import se.curity.identityserver.sdk.attribute.Attribute;
 import se.curity.identityserver.sdk.attribute.Attributes;
 import se.curity.identityserver.sdk.attribute.AuthenticationAttributes;
 import se.curity.identityserver.sdk.attribute.ContextAttributes;
@@ -11,34 +13,47 @@ import se.curity.identityserver.sdk.authentication.BackchannelAuthenticationHand
 import se.curity.identityserver.sdk.authentication.BackchannelAuthenticationRequest;
 import se.curity.identityserver.sdk.authentication.BackchannelAuthenticationResult;
 import se.curity.identityserver.sdk.authentication.BackchannelAuthenticatorState;
+import se.curity.identityserver.sdk.plugin.descriptor.BackchannelAuthenticatorPluginDescriptor;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static se.curity.identityserver.sdk.authentication.BackchannelAuthenticatorState.State.EXPIRED;
-import static se.curity.identityserver.sdk.authentication.BackchannelAuthenticatorState.State.FAILED;
-import static se.curity.identityserver.sdk.authentication.BackchannelAuthenticatorState.State.STARTED;
-import static se.curity.identityserver.sdk.authentication.BackchannelAuthenticatorState.State.SUCCEEDED;
-
-public class TestBackchannelAuthenticatorHandler implements BackchannelAuthenticationHandler
+public final class TestBackchannelAuthenticatorHandler implements BackchannelAuthenticationHandler
 {
     private static final Logger _logger = LoggerFactory.getLogger(TestBackchannelAuthenticatorHandler.class);
 
-    private static Map<String, BackchannelAuthenticatorState.State> mutableRequestStateMap = new HashMap<>();
+    private static Map<String, BackchannelAuthenticatorState> mutableRequestStateMap = new HashMap<>();
     private static Map<String, String> mutableRequestSubjectMap = new HashMap<>();
 
-    public TestBackchannelAuthenticatorHandler()
+    private final TestBackchannelAuthenticatorConfig _backchannelConfiguration;
+    private final TestAuthenticatorPluginConfig _frontchannelConfiguration;
+
+    /**
+     * Notice that because this backchannel plugin "links" to the {@link TestAuthenticatorPluginDescriptor}
+     * via the {@link BackchannelAuthenticatorPluginDescriptor#getFrontchannelPluginDescriptorReference()} method,
+     * this plugin can obtain both its own configuration object, as well as the linked plugin's configuration!
+     *
+     * @param backchannelConfiguration  this plugin's configuration
+     * @param frontchannelConfiguration the linked frontchannel plugins' configuration
+     */
+    public TestBackchannelAuthenticatorHandler(
+            TestBackchannelAuthenticatorConfig backchannelConfiguration,
+            TestAuthenticatorPluginConfig frontchannelConfiguration)
     {
+        _backchannelConfiguration = backchannelConfiguration;
+        _frontchannelConfiguration = frontchannelConfiguration;
     }
 
     @Override
-    public Optional<BackchannelAuthenticationResult> startAuthentication(String authReqId, String s1, BackchannelAuthenticationRequest backchannelAuthenticationRequest)
+    public Optional<BackchannelAuthenticationResult> startAuthentication(String authReqId,
+                                                                         String authenticatorId,
+                                                                         BackchannelAuthenticationRequest request)
     {
         _logger.trace("startAuthentication() called.");
         //TODO call frontchannel authenticator and get authenticationAttributes
-        mutableRequestSubjectMap.put(authReqId, backchannelAuthenticationRequest.getSubject());
-        return Optional.of(new BackchannelAuthenticationResult(null, new BackchannelAuthenticatorState(STARTED)));
+        mutableRequestSubjectMap.put(authReqId, request.getSubject());
+        return Optional.of(new BackchannelAuthenticationResult(null, BackchannelAuthenticatorState.STARTED));
     }
 
     @Override
@@ -46,24 +61,24 @@ public class TestBackchannelAuthenticatorHandler implements BackchannelAuthentic
     {
         _logger.trace("checkAuthentication() called.");
 
-        if(!mutableRequestSubjectMap.containsKey(authReqId))
+        if (!mutableRequestSubjectMap.containsKey(authReqId))
         {
             return Optional.of(new BackchannelAuthenticationResult(null,
-                    new BackchannelAuthenticatorState(EXPIRED)));
+                    BackchannelAuthenticatorState.EXPIRED));
         }
-        else if("denying-user".equals(mutableRequestSubjectMap.get(authReqId)))
+        else if ("denying-user".equals(mutableRequestSubjectMap.get(authReqId)))
         {
             return Optional.of(new BackchannelAuthenticationResult(null,
-                    new BackchannelAuthenticatorState(FAILED)));
+                    BackchannelAuthenticatorState.FAILED));
         }
 
         if (!mutableRequestStateMap.containsKey(authReqId))
         {
             // for test purposes, first time return STARTED status and SUCCEEDED subsequently
-            mutableRequestStateMap.put(authReqId, STARTED);
+            mutableRequestStateMap.put(authReqId, BackchannelAuthenticatorState.STARTED);
             _logger.trace("Authentication pending, still..");
             return Optional.of(new BackchannelAuthenticationResult(null,
-                    new BackchannelAuthenticatorState(STARTED)));
+                    BackchannelAuthenticatorState.STARTED));
         }
         else
         {
@@ -72,7 +87,7 @@ public class TestBackchannelAuthenticatorHandler implements BackchannelAuthentic
                     SubjectAttributes.of(mutableRequestSubjectMap.get(authReqId), Attributes.empty()),
                     ContextAttributes.empty());
             return Optional.of(new BackchannelAuthenticationResult(authenticationAttributes,
-                    new BackchannelAuthenticatorState(SUCCEEDED)));
+                    BackchannelAuthenticatorState.SUCCEEDED));
         }
     }
 

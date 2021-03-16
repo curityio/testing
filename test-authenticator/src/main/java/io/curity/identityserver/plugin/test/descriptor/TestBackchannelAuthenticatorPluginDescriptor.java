@@ -1,14 +1,13 @@
 package io.curity.identityserver.plugin.test.descriptor;
 
 import io.curity.identityserver.plugin.test.authentication.TestBackchannelAuthenticatorHandler;
-import io.curity.identityserver.plugin.test.config.TestBackchannelAuthenticatorConfigurationSetting;
+import io.curity.identityserver.plugin.test.config.TestBackchannelAuthenticatorConfig;
 import se.curity.identityserver.sdk.authentication.BackchannelAuthenticationHandler;
+import se.curity.identityserver.sdk.plugin.descriptor.AuthenticatorPluginDescriptor;
 import se.curity.identityserver.sdk.plugin.descriptor.BackchannelAuthenticatorPluginDescriptor;
 
-// SDK plugins do not have access to @NoYangGeneration
-// TODO Make yang generation work for backchannel authenticators, for now this is not fully validated configuration
-public class TestBackchannelAuthenticatorPluginDescriptor
-        implements BackchannelAuthenticatorPluginDescriptor<TestBackchannelAuthenticatorConfigurationSetting>
+public final class TestBackchannelAuthenticatorPluginDescriptor
+        implements BackchannelAuthenticatorPluginDescriptor<TestBackchannelAuthenticatorConfig>
 {
     @Override
     public Class<? extends BackchannelAuthenticationHandler> getBackchannelAuthenticationHandlerType()
@@ -23,8 +22,14 @@ public class TestBackchannelAuthenticatorPluginDescriptor
     }
 
     @Override
-    public Class<? extends TestBackchannelAuthenticatorConfigurationSetting> getConfigurationType()
+    public Class<? extends TestBackchannelAuthenticatorConfig> getConfigurationType()
     {
-        return TestBackchannelAuthenticatorConfigurationSetting.class;
+        return TestBackchannelAuthenticatorConfig.class;
+    }
+
+    @Override
+    public Class<? extends AuthenticatorPluginDescriptor<?>> getFrontchannelPluginDescriptorReference()
+    {
+        return TestAuthenticatorPluginDescriptor.class;
     }
 }

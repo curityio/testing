@@ -32,7 +32,7 @@ import se.curity.identityserver.sdk.web.Response;
 import java.util.Optional;
 import java.util.UUID;
 
-public class TestAuthenticatorRequestHandler implements AuthenticatorRequestHandler<Request>
+public final class TestAuthenticatorRequestHandler implements AuthenticatorRequestHandler<Request>
 {
     private static final Logger _logger = LoggerFactory.getLogger(TestAuthenticatorRequestHandler.class);
     private final TestAuthenticatorPluginConfig config;
