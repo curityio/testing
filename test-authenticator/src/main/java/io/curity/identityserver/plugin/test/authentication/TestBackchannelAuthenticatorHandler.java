@@ -46,14 +46,13 @@ public final class TestBackchannelAuthenticatorHandler implements BackchannelAut
     }
 
     @Override
-    public Optional<BackchannelAuthenticationResult> startAuthentication(String authReqId,
-                                                                         String authenticatorId,
-                                                                         BackchannelAuthenticationRequest request)
+    public boolean startAuthentication(String authReqId,
+                                       BackchannelAuthenticationRequest request)
     {
         _logger.trace("startAuthentication() called.");
         //TODO call frontchannel authenticator and get authenticationAttributes
         mutableRequestSubjectMap.put(authReqId, request.getSubject());
-        return Optional.of(new BackchannelAuthenticationResult(null, BackchannelAuthenticatorState.STARTED));
+        return true;
     }
 
     @Override
