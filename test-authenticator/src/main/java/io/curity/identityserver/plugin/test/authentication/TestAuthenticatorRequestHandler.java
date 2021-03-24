@@ -48,15 +48,10 @@ public final class TestAuthenticatorRequestHandler implements AuthenticatorReque
     public Optional<AuthenticationResult> get(Request request, Response response)
     {
         _logger.debug("GET request received for authentication");
-        String[] username = {null};
-        this.config.getUsername().ifPresent(value -> username[0] = value);
-        if (username[0] == null)
-        {
-            username[0] = UUID.randomUUID().toString();
-        }
+        String username = config.getUsername().orElseGet(() -> UUID.randomUUID().toString());
 
         return Optional.of(new AuthenticationResult(AuthenticationAttributes.of(
-                SubjectAttributes.of(username[0], Attributes.empty()),
+                SubjectAttributes.of(username, Attributes.empty()),
                 ContextAttributes.empty()
         )));
     }
