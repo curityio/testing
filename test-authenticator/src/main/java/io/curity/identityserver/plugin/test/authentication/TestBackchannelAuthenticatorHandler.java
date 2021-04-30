@@ -15,16 +15,21 @@ import se.curity.identityserver.sdk.authentication.BackchannelAuthenticationResu
 import se.curity.identityserver.sdk.authentication.BackchannelAuthenticatorState;
 import se.curity.identityserver.sdk.plugin.descriptor.BackchannelAuthenticatorPluginDescriptor;
 
+import java.time.Instant;
+import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
+import static java.time.temporal.ChronoUnit.SECONDS;
+import static se.curity.identityserver.sdk.authentication.BackchannelAuthenticatorState.STARTED;
 
 public final class TestBackchannelAuthenticatorHandler implements BackchannelAuthenticationHandler
 {
     private static final Logger _logger = LoggerFactory.getLogger(TestBackchannelAuthenticatorHandler.class);
 
-    private static Map<String, BackchannelAuthenticatorState> mutableRequestStateMap = new HashMap<>();
-    private static Map<String, String> mutableRequestSubjectMap = new HashMap<>();
+    private static final Map<String, BackchannelAuthenticatorState> mutableRequestStateMap = new HashMap<>();
+    private static final Map<String, Map.Entry<String, Instant>> mutableRequestSubjectMap = new HashMap<>();
 
     private final TestBackchannelAuthenticatorConfig _backchannelConfiguration;
     private final TestAuthenticatorPluginConfig _frontchannelConfiguration;
@@ -51,7 +56,7 @@ public final class TestBackchannelAuthenticatorHandler implements BackchannelAut
     {
         _logger.trace("startAuthentication() called.");
         //TODO call frontchannel authenticator and get authenticationAttributes
-        mutableRequestSubjectMap.put(authReqId, request.getSubject());
+        mutableRequestSubjectMap.put(authReqId, new AbstractMap.SimpleImmutableEntry<>(request.getSubject(), Instant.now()));
         return true;
     }
 
@@ -60,34 +65,54 @@ public final class TestBackchannelAuthenticatorHandler implements BackchannelAut
     {
         _logger.trace("checkAuthentication() called.");
 
+        String subject = mutableRequestSubjectMap.get(authReqId).getKey();
+
         if (!mutableRequestSubjectMap.containsKey(authReqId))
         {
             return Optional.of(new BackchannelAuthenticationResult(null,
                     BackchannelAuthenticatorState.EXPIRED));
         }
-        else if ("denying-user".equals(mutableRequestSubjectMap.get(authReqId)))
+        else if ("denying-user".equals(subject))
         {
             return Optional.of(new BackchannelAuthenticationResult(null,
                     BackchannelAuthenticatorState.FAILED));
         }
 
-        if (!mutableRequestStateMap.containsKey(authReqId))
+        if (mutableRequestStateMap.containsKey(authReqId))
         {
-            // for test purposes, first time return STARTED status and SUCCEEDED subsequently
-            mutableRequestStateMap.put(authReqId, BackchannelAuthenticatorState.STARTED);
-            _logger.trace("Authentication pending, still..");
-            return Optional.of(new BackchannelAuthenticationResult(null,
-                    BackchannelAuthenticatorState.STARTED));
-        }
-        else
-        {
+            if (_backchannelConfiguration.getDelay().isPresent())
+            {
+                Instant startAuthInstant = mutableRequestSubjectMap.get(authReqId).getValue();
+                Instant continueInstant = startAuthInstant.plus(_backchannelConfiguration.getDelay().get(), SECONDS);
+                Instant now = Instant.now();
+
+                if (now.isBefore(continueInstant))
+                {
+                    _logger.trace("Authentication pending till {}..", continueInstant);
+
+                    return createStartedBackchannelAuthenticationResult();
+                }
+            }
+
             _logger.trace("Authentication done");
             AuthenticationAttributes authenticationAttributes = AuthenticationAttributes.of(
-                    SubjectAttributes.of(mutableRequestSubjectMap.get(authReqId), Attributes.empty()),
+                    SubjectAttributes.of(subject, Attributes.empty()),
                     ContextAttributes.empty());
             return Optional.of(new BackchannelAuthenticationResult(authenticationAttributes,
                     BackchannelAuthenticatorState.SUCCEEDED));
         }
+        else
+        {
+            // for test purposes, first time return STARTED status and SUCCEEDED subsequently
+            mutableRequestStateMap.put(authReqId, STARTED);
+            _logger.trace("Authentication pending, still..");
+            return createStartedBackchannelAuthenticationResult();
+        }
+    }
+
+    private static Optional<BackchannelAuthenticationResult> createStartedBackchannelAuthenticationResult()
+    {
+        return Optional.of(new BackchannelAuthenticationResult(null, STARTED));
     }
 
     @Override
