@@ -72,11 +72,6 @@ public final class TestBackchannelAuthenticatorHandler implements BackchannelAut
             return Optional.of(new BackchannelAuthenticationResult(null,
                     BackchannelAuthenticatorState.EXPIRED));
         }
-        else if ("denying-user".equals(subject))
-        {
-            return Optional.of(new BackchannelAuthenticationResult(null,
-                    BackchannelAuthenticatorState.FAILED));
-        }
 
         if (mutableRequestStateMap.containsKey(authReqId))
         {
@@ -89,9 +84,16 @@ public final class TestBackchannelAuthenticatorHandler implements BackchannelAut
                 if (now.isBefore(continueInstant))
                 {
                     _logger.trace("Authentication pending till {}..", continueInstant);
-
                     return createStartedBackchannelAuthenticationResult();
                 }
+            }
+
+            Optional<String> mayBeRejectingUser = _backchannelConfiguration.getRejectingUser();
+            if (mayBeRejectingUser.isPresent() && subject.equals(mayBeRejectingUser.get()))
+            {
+                _logger.trace("User {} is rejecting authentication", mayBeRejectingUser.get());
+                return Optional.of(new BackchannelAuthenticationResult(null,
+                        BackchannelAuthenticatorState.FAILED));
             }
 
             _logger.trace("Authentication done");

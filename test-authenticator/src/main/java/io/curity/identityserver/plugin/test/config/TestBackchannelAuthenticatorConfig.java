@@ -9,4 +9,7 @@ public interface TestBackchannelAuthenticatorConfig extends Configuration
 {
     @Description("The number of seconds that should be delayed before authentication succeeds")
     Optional<Integer> getDelay();
+
+    @Description("The username for which the authentication is denied")
+    Optional<String> getRejectingUser();
 }
