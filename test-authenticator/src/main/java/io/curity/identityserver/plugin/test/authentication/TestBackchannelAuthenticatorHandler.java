@@ -5,6 +5,7 @@ import io.curity.identityserver.plugin.test.config.TestBackchannelAuthenticatorC
 import io.curity.identityserver.plugin.test.descriptor.TestAuthenticatorPluginDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import se.curity.identityserver.sdk.Result;
 import se.curity.identityserver.sdk.attribute.Attributes;
 import se.curity.identityserver.sdk.attribute.AuthenticationAttributes;
 import se.curity.identityserver.sdk.attribute.ContextAttributes;
@@ -51,13 +52,13 @@ public final class TestBackchannelAuthenticatorHandler implements BackchannelAut
     }
 
     @Override
-    public boolean startAuthentication(String authReqId,
-                                       BackchannelAuthenticationRequest request)
+    public Result startAuthentication(String authReqId,
+                                      BackchannelAuthenticationRequest request)
     {
         _logger.trace("startAuthentication() called.");
         //TODO call frontchannel authenticator and get authenticationAttributes
         mutableRequestSubjectMap.put(authReqId, new AbstractMap.SimpleImmutableEntry<>(request.getSubject(), Instant.now()));
-        return true;
+        Result.ok();
     }
 
     @Override

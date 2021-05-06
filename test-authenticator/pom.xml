@@ -32,7 +32,7 @@
         <dependency>
             <groupId>se.curity.identityserver</groupId>
             <artifactId>identityserver.sdk</artifactId>
-            <version>6.1.0-00a4f0e8cc</version>
+            <version>6.1.0-65e14556c3</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
