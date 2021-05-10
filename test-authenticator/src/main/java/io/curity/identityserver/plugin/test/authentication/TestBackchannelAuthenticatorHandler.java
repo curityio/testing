@@ -1,11 +1,9 @@
 package io.curity.identityserver.plugin.test.authentication;
 
-import io.curity.identityserver.plugin.test.config.TestAuthenticatorPluginConfig;
 import io.curity.identityserver.plugin.test.config.TestBackchannelAuthenticatorConfig;
 import io.curity.identityserver.plugin.test.descriptor.TestAuthenticatorPluginDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import se.curity.identityserver.sdk.Result;
 import se.curity.identityserver.sdk.attribute.Attributes;
 import se.curity.identityserver.sdk.attribute.AuthenticationAttributes;
 import se.curity.identityserver.sdk.attribute.ContextAttributes;
@@ -14,6 +12,7 @@ import se.curity.identityserver.sdk.authentication.BackchannelAuthenticationHand
 import se.curity.identityserver.sdk.authentication.BackchannelAuthenticationRequest;
 import se.curity.identityserver.sdk.authentication.BackchannelAuthenticationResult;
 import se.curity.identityserver.sdk.authentication.BackchannelAuthenticatorState;
+import se.curity.identityserver.sdk.authentication.BackchannelStartAuthenticationResult;
 import se.curity.identityserver.sdk.plugin.descriptor.BackchannelAuthenticatorPluginDescriptor;
 
 import java.time.Instant;
@@ -33,32 +32,30 @@ public final class TestBackchannelAuthenticatorHandler implements BackchannelAut
     private static final Map<String, Map.Entry<String, Instant>> mutableRequestSubjectMap = new HashMap<>();
 
     private final TestBackchannelAuthenticatorConfig _backchannelConfiguration;
-    private final TestAuthenticatorPluginConfig _frontchannelConfiguration;
 
     /**
-     * Notice that because this backchannel plugin "links" to the {@link TestAuthenticatorPluginDescriptor}
+     * Creates a test backchannel authentication handler.
+     * The configuration is injected by the dependency injection framework.
+     * If the backchannel plugin "links" to the {@link TestAuthenticatorPluginDescriptor}
      * via the {@link BackchannelAuthenticatorPluginDescriptor#getFrontchannelPluginDescriptorReference()} method,
      * this plugin can obtain both its own configuration object, as well as the linked plugin's configuration!
      *
      * @param backchannelConfiguration  this plugin's configuration
-     * @param frontchannelConfiguration the linked frontchannel plugins' configuration
      */
     public TestBackchannelAuthenticatorHandler(
-            TestBackchannelAuthenticatorConfig backchannelConfiguration,
-            TestAuthenticatorPluginConfig frontchannelConfiguration)
+            TestBackchannelAuthenticatorConfig backchannelConfiguration)
     {
         _backchannelConfiguration = backchannelConfiguration;
-        _frontchannelConfiguration = frontchannelConfiguration;
     }
 
     @Override
-    public Result startAuthentication(String authReqId,
-                                      BackchannelAuthenticationRequest request)
+    public BackchannelStartAuthenticationResult startAuthentication(String authReqId,
+                                                                    BackchannelAuthenticationRequest request)
     {
         _logger.trace("startAuthentication() called.");
-        //TODO call frontchannel authenticator and get authenticationAttributes
+
         mutableRequestSubjectMap.put(authReqId, new AbstractMap.SimpleImmutableEntry<>(request.getSubject(), Instant.now()));
-        Result.ok();
+        return BackchannelStartAuthenticationResult.ok();
     }
 
     @Override
