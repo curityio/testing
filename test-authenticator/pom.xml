@@ -6,7 +6,7 @@
 
     <groupId>io.curity.identityserver.plugin</groupId>
     <artifactId>identityserver.plugins.authenticators.test</artifactId>
-    <version>1.2.0-SNAPSHOT</version>
+    <version>2.0.0</version>
 
     <name>Test Authenticator</name>
 
@@ -41,30 +41,7 @@
         </dependency>
     </dependencies>
 
-    <repositories>
-        <repository>
-            <id>customer-release-repo</id>
-            <url>https://nexus.curityio.net/repository/customer-release-repo/</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>customer-snapshot-repo</id>
-            <name>Customer Snapshot Repository</name>
-            <url>https://nexus.curityio.net/repository/customer-snapshot-repo/</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </repository>
-    </repositories>
-
     <distributionManagement>
-        <repository>
-            <id>customer-release-repo</id>
-            <name>Customer Release Repository</name>
-            <url>https://nexus.curityio.net/repository/customer-release-repo/</url>
-        </repository>
         <snapshotRepository>
             <id>customer-snapshot-repo</id>
             <name>Curity Nexus Snapshot Repository</name>
