@@ -32,7 +32,7 @@ import se.curity.identityserver.sdk.web.Response;
 import java.util.Optional;
 import java.util.UUID;
 
-public class TestAuthenticatorRequestHandler implements AuthenticatorRequestHandler<Request>
+public final class TestAuthenticatorRequestHandler implements AuthenticatorRequestHandler<Request>
 {
     private static final Logger _logger = LoggerFactory.getLogger(TestAuthenticatorRequestHandler.class);
     private final TestAuthenticatorPluginConfig config;
@@ -48,15 +48,10 @@ public class TestAuthenticatorRequestHandler implements AuthenticatorRequestHand
     public Optional<AuthenticationResult> get(Request request, Response response)
     {
         _logger.debug("GET request received for authentication");
-        String[] username = {null};
-        this.config.getUsername().ifPresent(value -> username[0] = value);
-        if (username[0] == null)
-        {
-            username[0] = UUID.randomUUID().toString();
-        }
+        String username = config.getUsername().orElseGet(() -> UUID.randomUUID().toString());
 
         return Optional.of(new AuthenticationResult(AuthenticationAttributes.of(
-                SubjectAttributes.of(username[0], Attributes.empty()),
+                SubjectAttributes.of(username, Attributes.empty()),
                 ContextAttributes.empty()
         )));
     }
